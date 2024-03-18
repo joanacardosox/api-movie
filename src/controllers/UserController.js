@@ -18,7 +18,7 @@ class UserController {
   }
 
   async update(req, res) {
-    const { name, email, password } = req.body; // Adiciona password ao objeto
+    const { name, email, password, old_password } = req.body; // Adiciona password ao objeto
     const id = req.params.id; // Certifique-se de que o ID está sendo corretamente obtido
 
     try {
@@ -45,6 +45,12 @@ class UserController {
         user.password = hashedPassword;
       }
 
+      if (password && !old_password) {
+        throw new AppError(
+          "Você tem que informar a senha antiga para definir a senha!"
+        );
+      }
+
       // Atualiza o nome e o e-mail (se alterados)
       user.name = name || user.name;
       user.email = email || user.email;
@@ -54,7 +60,7 @@ class UserController {
         name: user.name,
         email: user.email,
         password: user.password, // Atualiza a senha se fornecida
-        updated_at: new Date(),
+        updated_at: knex.fn.now(),
       });
 
       res.status(200).json({ message: "Usuário atualizado com sucesso" });
