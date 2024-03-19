@@ -45,7 +45,7 @@ class UserController {
         user.password = hashedPassword;
       }
 
-      if (password && !old_password) {
+      if (password && old_password) {
         throw new AppError(
           "Você tem que informar a senha antiga para definir a senha!"
         );
@@ -67,6 +67,27 @@ class UserController {
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Erro ao atualizar o usuário" });
+    }
+  }
+
+  async delete(req, res) {
+    const { id } = req.params; // Obtenha o ID do usuário dos parâmetros da requisição
+
+    try {
+      // Verifica se o usuário existe
+      const user = await knex("users").where({ id }).first();
+
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      // Exclui o usuário do banco de dados
+      await knex("users").where({ id }).del();
+
+      res.status(200).json({ message: "Usuário excluído com sucesso" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Erro ao excluir o usuário" });
     }
   }
 }
