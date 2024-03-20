@@ -49,7 +49,18 @@ class NotesController {
 
     await knex("movies_notes").where({ id }).delete();
 
-    return res.json()
+    return res.json();
+  }
+
+  async index(req, res) {
+    const { title, user_id } = req.query;
+
+    const movie = await knex("movies_notes")
+      .where({ user_id })
+      .whereLike("title", `%${title}%`)
+      .orderBy("title");
+
+    return res.json(movie);
   }
 }
 
