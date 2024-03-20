@@ -31,6 +31,20 @@ class NotesController {
         .json({ status: "error", message: "Internal server error" });
     }
   }
+
+  async show(req, res) {
+    const { id } = req.params;
+
+    const movie = await knex("movies_notes").where({ id }).first();
+    const tags = await knex("tags").where({ note_id: id }).orderBy("name");
+
+    return res.json({
+      ...movie,
+      tags,
+    });
+  }
+
+ 
 }
 
 module.exports = NotesController;
