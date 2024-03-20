@@ -44,7 +44,13 @@ class NotesController {
     });
   }
 
- 
+  async delete(req, res) {
+    const { id } = req.params;
+
+    await knex("movies_notes").where({ id }).delete();
+
+    return res.json()
+  }
 }
 
 module.exports = NotesController;
