@@ -82,7 +82,7 @@ class NotesController {
 
         return {
           ...movie,
-          tags: moviesTags,
+          tags: tags,
         };
       });
 
