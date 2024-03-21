@@ -75,7 +75,18 @@ class NotesController {
           .where("title", "like", `%${title}%`)
           .orderBy("title");
       }
-      return res.json(movies);
+
+      const usersTags = await knex("tags").where({ user_id });
+      const movieNotesWihTags = movies.map((movie) => {
+        const moviesTags = usersTags.filter((tag) => tag.note_id === tags.id);
+
+        return {
+          ...movie,
+          tags: moviesTags,
+        };
+      });
+
+      return res.json(movieNotesWihTags);
     } catch (error) {
       console.error("Error:", error);
       return res.status(500).json({ message: "Internal Server Error" });
