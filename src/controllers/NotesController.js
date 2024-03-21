@@ -53,14 +53,33 @@ class NotesController {
   }
 
   async index(req, res) {
-    const { title, user_id } = req.query;
+    try {
+      const { title, user_id, tags } = req.query;
 
-    const movie = await knex("movies_notes")
-      .where({ user_id })
-      .whereLike("title", `%${title}%`)
-      .orderBy("title");
+      let movies;
 
-    return res.json(movie);
+      if (tags) {
+        const filterTags = tags.split(",").map((tag) => tag.trim());
+
+        movies = await knex("tags")
+          .select([
+            "movies_notes.id",
+            "movies_notes.title",
+            "movies_notes.user_id",
+          ])
+          .where("movies_notes.user_id", user_id)
+          .innerJoin("movies_notes", "movies_notes.id", "tags.note_id");
+      } else {
+        movies = await knex("movies_notes")
+          .where({ user_id })
+          .where("title", "like", `%${title}%`)
+          .orderBy("title");
+      }
+      return res.json(movies);
+    } catch (error) {
+      console.error("Error:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
   }
 }
 
